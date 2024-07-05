@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:project/models/app_settings.dart';
@@ -29,9 +30,9 @@ class HabitDatabase extends ChangeNotifier{
 
   final List<Habit> currentHabits = [];
 
-  Future<void> addHabit(String name) async{
+  Future<void> addHabit(String name, TimeOfDay? time) async{
     final newHabit = Habit()..name =name;
-
+    if(time!=null) newHabit.timeOfTheDay = time;
     await isar.writeTxn(()=>isar.habits.put(newHabit));
 
     readHabits();

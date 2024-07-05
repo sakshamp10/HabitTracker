@@ -14,6 +14,7 @@ import 'package:project/models/habit.dart';
 import 'package:project/theme/theme_provider.dart';
 import 'package:project/util/habit_util.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -31,39 +32,64 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController textController = TextEditingController();
 
   void createHabit(){
-    showDialog(
-      context: context, 
-      builder: (context) => AlertDialog(
-        content: TextField(controller: textController, decoration: InputDecoration(hintText: "Enter Habit Name"),),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.elliptical(10, 10))),
-        actions: [
-          
+  showDialog(
+    context: context, 
+    builder: (context) => AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min, // To ensure the dialog adjusts size based on the content
+        children: [
+          TextField(
+            controller: textController, 
+            decoration: InputDecoration(hintText: "Enter Habit Name"),
+          ),
+        ],
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.elliptical(10, 10))),
+      actions: [
         MaterialButton(
           onPressed: (){
             Navigator.pop(context);
-
             textController.clear();
           },
           child: Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),),
         ),
 
         MaterialButton(
-          onPressed: (){
+          onPressed: () async {
             String name = textController.text;
+            if (name.isEmpty) {
+              Fluttertoast.showToast(
+                msg: "Name cannot be empty",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                textColor: Theme.of(context).colorScheme.inversePrimary,
+                fontSize: 16.0
+              );
+            } else {
+              TimeOfDay? time = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.now(),
+              );
 
-            context.read<HabitDatabase>().addHabit(name);
+              // Create habit with or without time based on selection
+              String habitDetails = name;
+              if (time != null) {
+                habitDetails += " at " + time.format(context);
+              }
 
-            Navigator.pop(context);
-
-            textController.clear();
+              // Add habit details to the database
+              context.read<HabitDatabase>().addHabit(habitDetails,time);
+              Navigator.pop(context);
+              textController.clear();
+            }
           },
           child: Text("Add Habit", style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),),
         ),
-
       ],
-      ),
-    );
-  }
+    ),
+  );
+}
 
   void checkHabitOnOff(bool? value, Habit habit){
     if(value!=null){

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
 // run cmd
@@ -10,5 +11,7 @@ class Habit{
   late String name;
 
   List<DateTime> completedDays=[];
+
+  TimeOfDay? timeOfTheDay;
 
 }

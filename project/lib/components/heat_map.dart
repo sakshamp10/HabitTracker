@@ -7,6 +7,11 @@ class HeatMaps extends StatelessWidget {
   final Map<DateTime,int> dataset;
   const HeatMaps({super.key, required this.startDate,required this.dataset});
 
+  void func(){
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return HeatMap(
